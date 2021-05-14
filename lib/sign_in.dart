@@ -25,13 +25,14 @@ Widget emailID() {
         child: TextField(
           keyboardType: TextInputType.emailAddress,
           style: TextStyle(
+            fontSize: 12,
             color: Colors.black87,
           ),
           decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 5, left: 20, bottom: 5),
               hintText: 'Enter your email',
-              hintStyle: TextStyle(color: Colors.black87, fontSize: 14)),
+              hintStyle: TextStyle(color: Color(0xffa7a7a7), fontSize: 12)),
         ),
       )
     ],
@@ -55,12 +56,12 @@ Widget pwd() {
         child: TextField(
           obscureText: true,
           keyboardType: TextInputType.name,
-          style: TextStyle(color: Colors.black87),
+          style: TextStyle(fontSize: 12, color: Colors.black87),
           decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 5, left: 20, bottom: 5),
               hintText: 'Enter your password',
-              hintStyle: TextStyle(color: Colors.black87, fontSize: 14)),
+              hintStyle: TextStyle(color: Color(0xFFa7a7a7), fontSize: 12)),
         ),
       )
     ],
@@ -129,10 +130,13 @@ class _SignInState extends State<SignIn> {
                   child: SingleChildScrollView(
                     physics: AlwaysScrollableScrollPhysics(),
                     padding:
-                        EdgeInsets.symmetric(horizontal: 25, vertical: 220),
+                        EdgeInsets.symmetric(horizontal: 25, vertical: 180),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        SizedBox(
+                          height: 40,
+                        ),
                         Text(
                           'Sign In',
                           style: TextStyle(

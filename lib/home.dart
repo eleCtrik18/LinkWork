@@ -1,3 +1,4 @@
+import 'package:demo_app/API%20Services/login.dart';
 import 'package:demo_app/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,19 +20,20 @@ Widget buildCompany() {
             borderRadius: BorderRadius.circular(6),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black26, blurRadius: 0, offset: Offset(0, 0))
+                  color: Colors.black, blurRadius: 0, offset: Offset(0, 0))
             ]),
         height: 50,
         child: TextField(
           keyboardType: TextInputType.name,
           style: TextStyle(
+            fontSize: 14,
             color: Colors.black87,
           ),
           decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 5, left: 20, bottom: 5),
               hintText: 'Enter your company name',
-              hintStyle: TextStyle(color: Colors.black87, fontSize: 14)),
+              hintStyle: TextStyle(color: Color(0xFFa7a7a7), fontSize: 14)),
         ),
       )
     ],
@@ -55,13 +57,14 @@ Widget buildName() {
         child: TextField(
           keyboardType: TextInputType.name,
           style: TextStyle(
+            fontSize: 14,
             color: Colors.black87,
           ),
           decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 5, left: 20, bottom: 5),
               hintText: 'Enter your name',
-              hintStyle: TextStyle(color: Colors.black87, fontSize: 14)),
+              hintStyle: TextStyle(color: Color(0xffa7a7a7), fontSize: 14)),
         ),
       )
     ],
@@ -85,13 +88,14 @@ Widget buildEmail() {
         child: TextField(
           keyboardType: TextInputType.emailAddress,
           style: TextStyle(
+            fontSize: 14,
             color: Colors.black87,
           ),
           decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 5, left: 20, bottom: 5),
               hintText: 'Enter your email',
-              hintStyle: TextStyle(color: Colors.black87, fontSize: 14)),
+              hintStyle: TextStyle(color: Color(0xFFa7a7a7), fontSize: 14)),
         ),
       )
     ],
@@ -115,13 +119,14 @@ Widget buildNumber() {
         child: TextField(
           keyboardType: TextInputType.phone,
           style: TextStyle(
+            fontSize: 14,
             color: Colors.black87,
           ),
           decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 5, left: 20, bottom: 5),
               hintText: 'Enter your mobile number',
-              hintStyle: TextStyle(color: Colors.black87, fontSize: 14)),
+              hintStyle: TextStyle(color: Color(0xffa7a7a7), fontSize: 14)),
         ),
       )
     ],
@@ -146,13 +151,14 @@ Widget buildPass() {
           obscureText: true,
           keyboardType: TextInputType.visiblePassword,
           style: TextStyle(
+            fontSize: 14,
             color: Colors.black87,
           ),
           decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 5, left: 20, bottom: 5),
               hintText: 'Enter your password',
-              hintStyle: TextStyle(color: Colors.black87, fontSize: 14)),
+              hintStyle: TextStyle(color: Color(0xffa7a7a7), fontSize: 14)),
         ),
       )
     ],
@@ -177,13 +183,14 @@ Widget buildRpass() {
           obscureText: true,
           keyboardType: TextInputType.visiblePassword,
           style: TextStyle(
+            fontSize: 14,
             color: Colors.black87,
           ),
           decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 5, left: 20, bottom: 5),
               hintText: 'Re-Enter your password',
-              hintStyle: TextStyle(color: Colors.black87, fontSize: 14)),
+              hintStyle: TextStyle(color: Color(0xffa7a7a7), fontSize: 14)),
         ),
       )
     ],
@@ -214,7 +221,7 @@ Widget signup(BuildContext context) {
   return GestureDetector(
     onTap: () {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => SignIn()));
+          context, MaterialPageRoute(builder: (context) => LoginPage()));
     },
     child: RichText(
       text: TextSpan(children: [
@@ -263,7 +270,7 @@ class _HomeState extends State<Home> {
                   ),
                   child: SingleChildScrollView(
                     physics: AlwaysScrollableScrollPhysics(),
-                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 25),
+                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 45),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -285,15 +292,15 @@ class _HomeState extends State<Home> {
                               fontWeight: FontWeight.w300),
                         ),
                         SizedBox(
-                          height: 40,
+                          height: 25,
                         ),
                         buildCompany(),
                         SizedBox(
-                          height: 40,
+                          height: 25,
                         ),
                         buildName(),
                         SizedBox(
-                          height: 40,
+                          height: 25,
                         ),
                         Container(
                           padding: EdgeInsets.only(left: 20, right: 14),
@@ -310,7 +317,7 @@ class _HomeState extends State<Home> {
                               hint: Text(
                                 'Male',
                                 style: TextStyle(
-                                    color: Colors.black87, fontSize: 14),
+                                    color: Color(0xffa7a7a7), fontSize: 12),
                               ),
                               dropdownColor: Colors.grey[400],
                               icon: Icon(Icons.arrow_drop_down),
@@ -331,19 +338,19 @@ class _HomeState extends State<Home> {
                               }).toList()),
                         ),
                         SizedBox(
-                          height: 40,
+                          height: 25,
                         ),
                         buildEmail(),
                         SizedBox(
-                          height: 40,
+                          height: 25,
                         ),
                         buildNumber(),
                         SizedBox(
-                          height: 40,
+                          height: 25,
                         ),
                         buildPass(),
                         SizedBox(
-                          height: 40,
+                          height: 25,
                         ),
                         buildRpass(),
                         SizedBox(

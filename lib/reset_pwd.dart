@@ -25,13 +25,14 @@ Widget emailID() {
         child: TextField(
           keyboardType: TextInputType.emailAddress,
           style: TextStyle(
+            fontSize: 12,
             color: Colors.black87,
           ),
           decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 5, left: 20, bottom: 5),
               hintText: 'Enter your email',
-              hintStyle: TextStyle(color: Colors.black87, fontSize: 14)),
+              hintStyle: TextStyle(color: Color(0xffa7a7a7), fontSize: 14)),
         ),
       )
     ],
