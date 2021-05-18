@@ -25,7 +25,7 @@ Widget emailID() {
         child: TextField(
           keyboardType: TextInputType.emailAddress,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 14,
             color: Colors.black87,
           ),
           decoration: InputDecoration(
@@ -109,6 +109,7 @@ class _PasswordState extends State<Password> {
             value: SystemUiOverlayStyle.light,
             child: Stack(children: [
               Container(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
                   height: double.infinity,
                   width: double.infinity,
                   decoration: BoxDecoration(
@@ -125,7 +126,7 @@ class _PasswordState extends State<Password> {
                   child: SingleChildScrollView(
                       physics: AlwaysScrollableScrollPhysics(),
                       padding:
-                          EdgeInsets.symmetric(horizontal: 25, vertical: 220),
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 220),
                       child: Column(
                         children: [
                           Text(
@@ -158,7 +159,7 @@ class _PasswordState extends State<Password> {
                           ),
                           signupr(context),
                           SizedBox(
-                            height: 5,
+                            height: 13,
                           ),
                           signinr(context)
                         ],

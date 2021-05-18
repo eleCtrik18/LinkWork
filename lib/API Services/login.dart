@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:demo_app/bocycox.dart';
+import 'package:demo_app/help.dart';
 import 'package:demo_app/home.dart';
 import 'package:demo_app/reset_pwd.dart';
 import 'package:flutter/material.dart';
@@ -117,16 +119,34 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           textSection(),
                           SizedBox(
-                            height: 20,
+                            height: 15,
                           ),
                           Container(
+                            padding: EdgeInsets.symmetric(horizontal: 15),
                             height: 15,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 SizedBox(
                                   height: 20,
-                                  width: 50,
+                                  width: 20,
+                                  child: Checkbox(
+                                    value: firstvaluer,
+                                    checkColor: Colors.white,
+                                    activeColor: Colors.blue,
+                                    onChanged: (bool? value1) {
+                                      setState(() {
+                                        firstvaluer = value1!;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                  child: Text(
+                                    'Remember Me',
+                                    style: TextStyle(color: Color(0xffa7a7a7)),
+                                  ),
                                 ),
                                 Spacer(),
                                 GestureDetector(
@@ -135,25 +155,24 @@ class _LoginPageState extends State<LoginPage> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  Password()));
+                                                  TaskEditPage()));
                                     },
-                                    child: SizedBox(
-                                      height: 20,
-                                      width: 120,
-                                      child: Text(
-                                        "Reset Password",
-                                        style: TextStyle(
-                                          color: Color(0xFF0176ff),
-                                          fontSize: 14,
-                                        ),
+                                    child: Text(
+                                      "Reset Password",
+                                      style: TextStyle(
+                                        color: Color(0xFF0176ff),
+                                        fontSize: 14,
                                       ),
                                     ))
                               ],
                             ),
                           ),
+                          SizedBox(
+                            height: 20,
+                          ),
                           buttonSection(),
                           SizedBox(
-                            height: 5,
+                            height: 20,
                           ),
                           signin(context),
                         ]),
@@ -169,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
     Map data = {
       'email': email,
       'pass': pass,
-      'enc': 'b26ce731026c8ed318a609a821737f2bd3442357cc6fafe3bfd3268084a135bb'
+      'enc': 'b26ce731026c8ed318a609a821737f2bd3442357cc6fafe3bfd3268084a135bb',
     };
     print(data);
     var jsonResponse = null;
@@ -183,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
     if (response.statusCode == 200 || response.statusCode == 400) {
       jsonResponse = json.decode(response.body);
 
-      if (jsonResponse != null) {
+      if (jsonResponse['status'] != 'Failed') {
         setState(() {
           _isLoading = false;
         });
@@ -191,12 +210,15 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) => LandPage()),
             (Route<dynamic> route) => false);
+      } else {
+        setState(() {
+          _isLoading = false;
+          print("Snackbar");
+          final snackBar =
+              SnackBar(content: Text('Email or Password Incorrect'));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        });
       }
-    } else {
-      setState(() {
-        _isLoading = false;
-      });
-      print("Wrong");
     }
   }
 
@@ -224,7 +246,7 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 0.0,
         color: Colors.blue[400],
         child: Text("Sign In",
-            style: TextStyle(color: Colors.white70, fontSize: 18)),
+            style: TextStyle(color: Colors.white, fontSize: 18)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
       ),
     );
@@ -255,6 +277,7 @@ class _LoginPageState extends State<LoginPage> {
               child: TextFormField(
                 // autovalidate: true,
                 controller: emailController,
+                autofillHints: [AutofillHints.email],
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.black87,
