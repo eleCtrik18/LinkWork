@@ -1,5 +1,5 @@
-import 'package:demo_app/home.dart';
-import 'package:demo_app/reset_pwd.dart';
+import 'package:demo_app/screens/signup.dart';
+import 'package:demo_app/screens/reset_pwd.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

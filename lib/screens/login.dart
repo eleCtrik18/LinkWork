@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:demo_app/bocycox.dart';
-import 'package:demo_app/help.dart';
-import 'package:demo_app/home.dart';
-import 'package:demo_app/reset_pwd.dart';
+import 'package:demo_app/screens/signup.dart';
+import 'package:demo_app/screens/reset_pwd.dart';
+import 'package:demo_app/screens/temp_token.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -17,10 +17,18 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-Widget signin(BuildContext context) {
+signin(BuildContext context) {
   return GestureDetector(
     onTap: () {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (c, a1, a2) => Home(),
+          transitionsBuilder: (c, anim, a2, child) =>
+              FadeTransition(opacity: anim, child: child),
+          transitionDuration: Duration(milliseconds: 300),
+        ),
+      );
     },
     child: RichText(
       text: TextSpan(children: [
@@ -39,6 +47,24 @@ Widget signin(BuildContext context) {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  var tokenValue = "";
+  @override
+  void initState() {
+    // TODO: implement initState
+    fetchToken();
+    super.initState();
+  }
+
+  void fetchToken() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var x = pref.getString("token").toString();
+    setState(() {
+      tokenValue = x;
+    });
+
+    //print("Fetch Token Values : " + tokenValue);
+  }
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   void validate() async {
@@ -47,6 +73,8 @@ class _LoginPageState extends State<LoginPage> {
         _isLoading = true;
       });
       //showLoaderDialog(context);
+      // fbtoken('$id');
+
       signIn(emailController.text, passwordController.text);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('email', 'useremail@');
@@ -152,10 +180,19 @@ class _LoginPageState extends State<LoginPage> {
                                 GestureDetector(
                                     onTap: () {
                                       Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  TaskEditPage()));
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (c, a1, a2) =>
+                                              Password(),
+                                          transitionsBuilder:
+                                              (c, anim, a2, child) =>
+                                                  FadeTransition(
+                                                      opacity: anim,
+                                                      child: child),
+                                          transitionDuration:
+                                              Duration(milliseconds: 300),
+                                        ),
+                                      );
                                     },
                                     child: Text(
                                       "Reset Password",
@@ -183,12 +220,47 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // fbtoken(String id, enc, firebase) async {
+  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  //   Map data = {
+  //     id: '$id',
+  //     enc: 'b26ce731026c8ed318a609a821737f2bd3442357cc6fafe3bfd3268084a135bb',
+  //     firebase: '$tokenValue',
+  //   };
+  //   print(data);
+  //   var jsonResponse = null;
+
+  //   var response = await http.post(
+  //       Uri.parse(
+  //         "https://www.linkwork.in/app_api/Firebase",
+  //       ),
+  //       body: data);
+  //   print(response.body);
+  //   if (response.statusCode == 200 || response.statusCode == 400) {
+  //     jsonResponse = json.decode(response.body);
+
+  //     if (jsonResponse['status'] == '1') {
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //       print('Firebase Token Passed');
+  //     }
+  //     if (jsonResponse['status'] == '0') {
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //       print('Firebase Token Failed');
+  //     }
+  //   }
+  // }
+
   signIn(String email, pass) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     Map data = {
       'email': email,
       'pass': pass,
       'enc': 'b26ce731026c8ed318a609a821737f2bd3442357cc6fafe3bfd3268084a135bb',
+      'firebase': '$tokenValue',
     };
     print(data);
     var jsonResponse = null;

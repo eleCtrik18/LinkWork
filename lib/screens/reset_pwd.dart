@@ -1,5 +1,5 @@
-import 'package:demo_app/home.dart';
-import 'package:demo_app/sign_in.dart';
+import 'package:demo_app/screens/signup.dart';
+import 'package:demo_app/backup%20of%20home/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -62,7 +62,14 @@ Widget signinr(BuildContext context) {
   return GestureDetector(
     onTap: () {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => SignIn()));
+        context,
+        PageRouteBuilder(
+          pageBuilder: (c, a1, a2) => SignIn(),
+          transitionsBuilder: (c, anim, a2, child) =>
+              FadeTransition(opacity: anim, child: child),
+          transitionDuration: Duration(milliseconds: 300),
+        ),
+      );
     },
     child: RichText(
       text: TextSpan(children: [
@@ -83,7 +90,15 @@ Widget signinr(BuildContext context) {
 Widget signupr(BuildContext context) {
   return GestureDetector(
     onTap: () {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (c, a1, a2) => Home(),
+          transitionsBuilder: (c, anim, a2, child) =>
+              FadeTransition(opacity: anim, child: child),
+          transitionDuration: Duration(milliseconds: 300),
+        ),
+      );
     },
     child: RichText(
       text: TextSpan(children: [

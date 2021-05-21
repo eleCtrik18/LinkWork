@@ -35,7 +35,7 @@ class _LandPageState extends State<LandPage> {
           // ignore: deprecated_member_use
           FlatButton(
             onPressed: () {
-              sharedPreferences.clear();
+              sharedPreferences.remove("email");
               // ignore: deprecated_member_use
               sharedPreferences.commit();
               Navigator.of(context).pushAndRemoveUntil(

@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:checkbox_formfield/checkbox_icon_formfield.dart';
 import 'package:checkbox_formfield/checkbox_list_tile_formfield.dart';
-import 'package:demo_app/API%20Services/login.dart';
+import 'package:demo_app/screens/login.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:demo_app/sign_in.dart';
+import 'package:demo_app/backup%20of%20home/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:wc_form_validators/wc_form_validators.dart';
 
-import 'API Services/land_page.dart';
+import 'land_page.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -24,7 +24,14 @@ Widget signup(BuildContext context) {
   return GestureDetector(
     onTap: () {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => LoginPage()));
+        context,
+        PageRouteBuilder(
+          pageBuilder: (c, a1, a2) => LoginPage(),
+          transitionsBuilder: (c, anim, a2, child) =>
+              FadeTransition(opacity: anim, child: child),
+          transitionDuration: Duration(milliseconds: 300),
+        ),
+      );
     },
     child: RichText(
       text: TextSpan(children: [
@@ -52,21 +59,24 @@ class _HomeState extends State<Home> {
         _isLoading = true;
       });
       if (_checkKey.currentState!.validate()) {
+        print('Check function if');
         _checkKey.currentState!.save();
+        signupapi(
+            companyController.text,
+            nameController.text,
+            genderController.text,
+            emailupController.text,
+            phoneController.text,
+            passwordupController.text,
+            repasswordupController.text,
+            referralController.text);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('email', 'useremail@');
       }
       //showLoaderDialog(context);
-      signupapi(
-          companyController.text,
-          nameController.text,
-          genderController.text,
-          emailupController.text,
-          phoneController.text,
-          passwordupController.text,
-          repasswordupController.text,
-          referralController.text);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('email', 'useremail@');
-      return;
+      else {
+        print('Check');
+      }
     } else {
       print("UnSuccessfull");
     }
@@ -80,7 +90,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final now = new DateTime.now().add(Duration(days: 14));
-    String formatter = DateFormat('d-MM-y').format(now);
+    String formatter = DateFormat('dd-MM-y').format(now);
 
     return Scaffold(
         body: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -181,7 +191,7 @@ class _HomeState extends State<Home> {
     Map data = {
       'company_name': companyName,
       'person_name': personName,
-      'gender': gender,
+      'gender': valChoose,
       'email': email,
       'mobile': mobile,
       'pass': pass,
@@ -190,9 +200,9 @@ class _HomeState extends State<Home> {
       'enc': "b26ce731026c8ed318a609a821737f2bd3442357cc6fafe3bfd3268084a135bb",
     };
     print(data);
-    var jsonResponse = null;
+    var jsonResponse;
 
-    var response = await http.post(
+    http.Response response = await http.post(
         Uri.parse(
           "https://www.linkwork.in/app_api/Signup",
         ),
@@ -207,34 +217,45 @@ class _HomeState extends State<Home> {
         });
         final snackBar = SnackBar(content: Text('User Already Registered'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-        if (jsonResponse['status'] == 'Invalid Request') {
-          setState(() {
-            _isLoading = false;
-          });
-          final snackBar = SnackBar(content: Text('Please Contact Support'));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-          if (jsonResponse['status'] > '22') {
-            setState(() {
-              _isLoading = false;
-            });
-            final snackBar = SnackBar(content: Text('Registration Successful'));
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          }
-        }
       }
 
-      // if (jsonResponse != null) {
-      //   setState(() {
-      //     _isLoading = false;
-      //   });
-      //   sharedPreferences.setString("enc", jsonResponse['enc']);
-      //   Navigator.of(context).pushAndRemoveUntil(
-      //       MaterialPageRoute(builder: (BuildContext context) => LandPage()),
-      //       (Route<dynamic> route) => false);
+      if (jsonResponse['status'] == 'Invalid Request') {
+        setState(() {
+          _isLoading = false;
+        });
+        final snackBar = SnackBar(content: Text('Please Contact Support'));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
 
-    } else {
+      if (jsonResponse['status'] == '1') {
+        setState(() {
+          _isLoading = false;
+        });
+        final snackBar = SnackBar(
+          content: Text('Registration Succesfull!'),
+          action: SnackBarAction(
+            label: 'Sign In',
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => LoginPage()));
+            },
+          ),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    }
+
+    // if (jsonResponse != null) {
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    //   sharedPreferences.setString("enc", jsonResponse['enc']);
+    //   Navigator.of(context).pushAndRemoveUntil(
+    //       MaterialPageRoute(builder: (BuildContext context) => LandPage()),
+    //       (Route<dynamic> route) => false);
+
+    else {
       setState(() {
         _isLoading = false;
       });
@@ -377,48 +398,61 @@ class _HomeState extends State<Home> {
                         offset: Offset(0, 0))
                   ]),
               height: 50,
-              child: TextFormField(
-                controller: genderController,
-                keyboardType: TextInputType.name,
-                style: TextStyle(fontSize: 14, color: Colors.black87),
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding:
-                        EdgeInsets.only(top: 5, left: 20, bottom: 5),
-                    hintText: 'Enter your gender (Male),(Female),(Other)',
-                    hintStyle:
-                        TextStyle(color: Color(0xFFa7a7a7), fontSize: 14)),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Can't be empty";
-                  } else if (!RegExp(r"^[MmaleFfemaleOothers]")
-                      .hasMatch(value)) {
-                    return 'Enter a valid Gender';
-                  }
-                },
+              // child: TextFormField(
+              //   controller: genderController,
+              //   keyboardType: TextInputType.name,
+              //   style: TextStyle(fontSize: 14, color: Colors.black87),
+              //   decoration: InputDecoration(
+              //       border: InputBorder.none,
+              //       contentPadding:
+              //           EdgeInsets.only(top: 5, left: 20, bottom: 5),
+              //       hintText: 'Enter your gender (Male),(Female),(Other)',
+              //       hintStyle:
+              //           TextStyle(color: Color(0xFFa7a7a7), fontSize: 14)),
+              //   validator: (value) {
+              //     if (value!.isEmpty) {
+              //       return "Can't be empty";
+              //     } else if (!RegExp(r"^[MmaleFfemaleOothers]")
+              //         .hasMatch(value)) {
+              //       return 'Enter a valid Gender';
+              //     }
+              //   },
+              // ),
+              child: Container(
+                padding: EdgeInsets.only(left: 20, right: 14),
+                decoration: BoxDecoration(
+                    color: Color(0xffedeef6),
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 0,
+                          offset: Offset(0, 0))
+                    ]),
+                child: DropdownButton(
+                    hint: Text(
+                      'Male',
+                      style: TextStyle(color: Color(0xffa7a7a7), fontSize: 14),
+                    ),
+                    dropdownColor: Colors.grey[400],
+                    icon: Icon(Icons.arrow_drop_down),
+                    isExpanded: true,
+                    style: TextStyle(color: Colors.black87),
+                    underline: SizedBox(),
+                    value: valChoose,
+                    onChanged: (newValue) {
+                      setState(() {
+                        valChoose = newValue as String?;
+                        print(valChoose);
+                      });
+                    },
+                    items: listItem.map((valueItem) {
+                      return DropdownMenuItem(
+                        value: valueItem,
+                        child: Text(valueItem),
+                      );
+                    }).toList()),
               ),
-              // child: DropdownButton(
-              //     hint: Text(
-              //       'Male',
-              //       style: TextStyle(color: Color(0xffa7a7a7), fontSize: 14),
-              //     ),
-              //     dropdownColor: Colors.grey[400],
-              //     icon: Icon(Icons.arrow_drop_down),
-              //     isExpanded: true,
-              //     style: TextStyle(color: Colors.black87),
-              //     underline: SizedBox(),
-              //     value: valChoose,
-              //     onChanged: (newValue) {
-              //       setState(() {
-              //         valChoose = newValue as String?;
-              //       });
-              //     },
-              //     items: listItem.map((valueItem) {
-              //       return DropdownMenuItem(
-              //         value: valueItem,
-              //         child: Text(valueItem),
-              //       );
-              //     }).toList()),
             ),
             SizedBox(
               height: 15,
@@ -602,22 +636,26 @@ class _HomeState extends State<Home> {
   }
 
   Widget checkboxup() {
-    return Container(
-      child: Form(
-        key: _checkKey,
-        child: SizedBox(
-          child: CheckboxListTileFormField(
-            title: Text('I agree the terms and conditions',
-                style: TextStyle(fontSize: 14, color: Color(0xffa7a7a7))),
-            onSaved: (bool value) {},
-            validator: (bool value) {
-              if (value) {
-                return null;
-              } else {
-                return 'Please accept Terms and Condition';
-              }
-            },
-          ),
+    return Form(
+      key: _checkKey,
+      child: ListTileTheme(
+        contentPadding: EdgeInsets.all(0),
+        child: CheckboxListTileFormField(
+          controlAffinity: ListTileControlAffinity.leading,
+          title: Text('I agree the terms and conditions',
+              style: TextStyle(fontSize: 16, color: Color(0xffa7a7a7))),
+          // onSaved: (bool value) {},
+
+          validator: (bool value) {
+            print(value.toString() + "Before if");
+            if (value == false) {
+              print(value);
+              return 'Please accept Terms and Condition';
+            } else {
+              print(value);
+              return null;
+            }
+          },
         ),
       ),
     );
