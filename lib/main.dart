@@ -2,10 +2,13 @@
 
 import 'package:demo_app/screens/land_page.dart';
 import 'package:demo_app/screens/signup.dart';
+import 'package:demo_app/utility/connectivity_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'screens/login.dart';
@@ -56,20 +59,77 @@ Future<void> main() async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   var email = sharedPreferences.getString('email');
   print(email);
-  runApp(MaterialApp(home: email == null ? LoginPage() : LandPage()));
+  runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => ConnectivityProvider(),
+          child: LoginPage(),
+        )
+      ],
+      child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: email == null ? LoginPage() : LandPage())));
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification notification = message.notification;
+      AndroidNotification android = message.notification?.android;
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                color: Colors.blue,
+                playSound: true,
+                icon: '@mipmap/ic_launcher',
+              ),
+            ));
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new onMessageOpenedApp event was published!');
+      RemoteNotification notification = message.notification;
+      AndroidNotification android = message.notification?.android;
+      if (notification != null && android != null) {
+        showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: Text(notification.title),
+                content: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [Text(notification.body)],
+                  ),
+                ),
+              );
+            });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final bool disableButton = true;
-    return MaterialApp(
-      title: 'Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.light(),
-      home: LoginPage(),
-    );
+    // TODO: implement build
+    return Container();
   }
 }

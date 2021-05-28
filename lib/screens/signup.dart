@@ -5,7 +5,6 @@ import 'package:checkbox_formfield/checkbox_list_tile_formfield.dart';
 import 'package:demo_app/screens/login.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:demo_app/backup%20of%20home/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -73,6 +72,7 @@ class _HomeState extends State<Home> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('email', 'useremail@');
       }
+
       //showLoaderDialog(context);
       else {
         print('Check');
@@ -660,42 +660,4 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-  //   return FormField<bool>(
-  //     key: _checkKey,
-  //     builder: (state) {
-  //       return Column(
-  //         children: <Widget>[
-  //           Row(
-  //             children: <Widget>[
-  //               Checkbox(
-  //                   value: checkboxValue,
-  //                   onChanged: (value) {
-  //                     setState(() {
-
-  //                       checkboxValue = value!;
-  //                       state.didChange(value);
-  //                     });
-  //                   }),
-  //               Text('I agree the Terms and Conditions'),
-  //             ],
-  //           ),
-
-  //           Text(
-  //             state.errorText ?? 'error',
-  //             style: TextStyle(
-  //               color: Theme.of(context).errorColor,
-  //             ),
-  //           )
-  //         ],
-  //       );
-  //     },
-
-  //     validator: (value) {
-  //       if (!checkboxValue) {
-  //         return 'You need to accept terms';
-  //       } else {
-  //         return null;
-  //       }
-  //     },
-  //   );
 }

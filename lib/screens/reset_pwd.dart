@@ -1,5 +1,6 @@
+import 'package:demo_app/screens/login.dart';
 import 'package:demo_app/screens/signup.dart';
-import 'package:demo_app/backup%20of%20home/sign_in.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -64,7 +65,7 @@ Widget signinr(BuildContext context) {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (c, a1, a2) => SignIn(),
+          pageBuilder: (c, a1, a2) => LoginPage(),
           transitionsBuilder: (c, anim, a2, child) =>
               FadeTransition(opacity: anim, child: child),
           transitionDuration: Duration(milliseconds: 300),

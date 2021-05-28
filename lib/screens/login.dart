@@ -1,12 +1,19 @@
 import 'dart:convert';
 
+import 'package:connectivity/connectivity.dart';
+import 'package:demo_app/main.dart';
+import 'package:demo_app/screens/chat_box.dart';
 import 'package:demo_app/screens/signup.dart';
 import 'package:demo_app/screens/reset_pwd.dart';
 import 'package:demo_app/screens/temp_token.dart';
+import 'package:demo_app/utility/connectivity_provider.dart';
+import 'package:demo_app/utility/no_internet.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -77,7 +84,8 @@ class _LoginPageState extends State<LoginPage> {
 
       signIn(emailController.text, passwordController.text);
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('email', 'useremail@');
+      prefs.setString('email', emailController.text);
+      //showNotification();
       return;
     } else {
       print("UnSuccessfull");
@@ -95,129 +103,11 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _isLoading = false;
   bool firstvaluer = false;
+  // bool isOnline = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light,
-        child: Stack(children: [
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xffFFFFFF),
-                    Color(0xffFFFFFF),
-                    Color(0xffFFFFFF),
-                    Color(0xffFFFFFF),
-                  ]),
-            ),
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : SingleChildScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 180),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: 40,
-                          ),
-                          Text(
-                            'Sign In',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            'Welcome to LinkWork - Task Management',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w300),
-                          ),
-                          textSection(),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 15),
-                            height: 15,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: Checkbox(
-                                    value: firstvaluer,
-                                    checkColor: Colors.white,
-                                    activeColor: Colors.blue,
-                                    onChanged: (bool? value1) {
-                                      setState(() {
-                                        firstvaluer = value1!;
-                                      });
-                                    },
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                  child: Text(
-                                    'Remember Me',
-                                    style: TextStyle(color: Color(0xffa7a7a7)),
-                                  ),
-                                ),
-                                Spacer(),
-                                GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (c, a1, a2) =>
-                                              Password(),
-                                          transitionsBuilder:
-                                              (c, anim, a2, child) =>
-                                                  FadeTransition(
-                                                      opacity: anim,
-                                                      child: child),
-                                          transitionDuration:
-                                              Duration(milliseconds: 300),
-                                        ),
-                                      );
-                                    },
-                                    child: Text(
-                                      "Reset Password",
-                                      style: TextStyle(
-                                        color: Color(0xFF0176ff),
-                                        fontSize: 14,
-                                      ),
-                                    ))
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          buttonSection(),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          signin(context),
-                        ]),
-                  ),
-          )
-        ]),
-      ),
-    );
+    return Scaffold(body: buildbody());
   }
 
   // fbtoken(String id, enc, firebase) async {
@@ -255,6 +145,10 @@ class _LoginPageState extends State<LoginPage> {
   // }
 
   signIn(String email, pass) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("email", email);
+
+    prefs.setString('pass', pass);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     Map data = {
       'email': email,
@@ -263,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
       'firebase': '$tokenValue',
     };
     print(data);
-    var jsonResponse = null;
+    var jsonResponse;
 
     var response = await http.post(
         Uri.parse(
@@ -278,6 +172,7 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           _isLoading = false;
         });
+        showNotification();
         sharedPreferences.setString("id", jsonResponse['id']);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) => LandPage()),
@@ -412,5 +307,284 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  void showNotification() {
+    flutterLocalNotificationsPlugin.show(
+        0,
+        "Welcome to Linkwork",
+        "Manage all you works without any lags",
+        NotificationDetails(
+            android: AndroidNotificationDetails(
+                channel.id, channel.name, channel.description,
+                importance: Importance.high,
+                color: Colors.blue,
+                playSound: true,
+                icon: '@mipmap/ic_launcher')));
+  }
+
+  Future onSelectNotification(String payload) async {
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (c, a1, a2) => Chatpage(),
+        transitionsBuilder: (c, anim, a2, child) =>
+            FadeTransition(opacity: anim, child: child),
+        transitionDuration: Duration(milliseconds: 300),
+      ),
+    );
+  }
+
+  Widget buildbody() {
+    return StreamBuilder(
+        stream: Connectivity().onConnectivityChanged,
+        builder:
+            (BuildContext context, AsyncSnapshot<ConnectivityResult> snapshot) {
+          if (snapshot != null &&
+              snapshot.hasData &&
+              snapshot.data != ConnectivityResult.none) {
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle.light,
+              child: Stack(children: [
+                Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xffFFFFFF),
+                          Color(0xffFFFFFF),
+                          Color(0xffFFFFFF),
+                          Color(0xffFFFFFF),
+                        ]),
+                  ),
+                  child: _isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : SingleChildScrollView(
+                          physics: AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 180),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 40,
+                                ),
+                                Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  'Welcome to LinkWork - Task Management',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w300),
+                                ),
+                                textSection(),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 15),
+                                  height: 15,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: Checkbox(
+                                          value: firstvaluer,
+                                          checkColor: Colors.white,
+                                          activeColor: Colors.blue,
+                                          onChanged: (bool? value1) {
+                                            setState(() {
+                                              firstvaluer = value1!;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                        child: Text(
+                                          'Remember Me',
+                                          style: TextStyle(
+                                              color: Color(0xffa7a7a7)),
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (c, a1, a2) =>
+                                                    Password(),
+                                                transitionsBuilder:
+                                                    (c, anim, a2, child) =>
+                                                        FadeTransition(
+                                                            opacity: anim,
+                                                            child: child),
+                                                transitionDuration:
+                                                    Duration(milliseconds: 300),
+                                              ),
+                                            );
+                                          },
+                                          child: Text(
+                                            "Reset Password",
+                                            style: TextStyle(
+                                              color: Color(0xFF0176ff),
+                                              fontSize: 14,
+                                            ),
+                                          ))
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                buttonSection(),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                signin(context),
+                              ]),
+                        ),
+                )
+              ]),
+            );
+          } else if (snapshot.data == ConnectivityResult.none) {
+            return NoInternet();
+          }
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle.light,
+            child: Stack(children: [
+              Container(
+                height: double.infinity,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xffFFFFFF),
+                        Color(0xffFFFFFF),
+                        Color(0xffFFFFFF),
+                        Color(0xffFFFFFF),
+                      ]),
+                ),
+                child: _isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 180),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 40,
+                              ),
+                              Text(
+                                'Sign In',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                'Welcome to LinkWork - Task Management',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w300),
+                              ),
+                              textSection(),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 15),
+                                height: 15,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: Checkbox(
+                                        value: firstvaluer,
+                                        checkColor: Colors.white,
+                                        activeColor: Colors.blue,
+                                        onChanged: (bool? value1) {
+                                          setState(() {
+                                            firstvaluer = value1!;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                      child: Text(
+                                        'Remember Me',
+                                        style:
+                                            TextStyle(color: Color(0xffa7a7a7)),
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (c, a1, a2) =>
+                                                  Password(),
+                                              transitionsBuilder:
+                                                  (c, anim, a2, child) =>
+                                                      FadeTransition(
+                                                          opacity: anim,
+                                                          child: child),
+                                              transitionDuration:
+                                                  Duration(milliseconds: 300),
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          "Reset Password",
+                                          style: TextStyle(
+                                            color: Color(0xFF0176ff),
+                                            fontSize: 14,
+                                          ),
+                                        ))
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              buttonSection(),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              signin(context),
+                            ]),
+                      ),
+              )
+            ]),
+          );
+        });
   }
 }
