@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class Chatpage extends StatefulWidget {
   @override
@@ -13,8 +14,9 @@ class _ChatpageState extends State<Chatpage> {
         padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
         height: 900,
         width: MediaQuery.of(context).size.width / 0.60,
-        child: InAppWebView(
-          initialUrl: "https://www.linkwork.in/employee/Chat/",
+        child: Container(
+          alignment: Alignment.center,
+          child: Text('Notification Page'),
         ));
   }
 }

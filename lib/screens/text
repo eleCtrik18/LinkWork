@@ -1,0 +1,45 @@
+$msg = [
+		'title' => 'This is for chat',
+		'subtitle'	=> 'This is a subtitle. subtitle',
+		'body' => 'body is description',
+		'icon' => 'https://beta.linkwork.in/assets/images/title.png',
+// 		'click_action' => 'https://beta.linkwork.in/',
+// 		'image' => 'https://www.linkwork.in/assets/images/title.png',
+// 		'style' => 'picture',
+// 		'picture' => 'https://www.linkwork.in/assets/images/title.png',
+		'color' => '#79bc64',
+    ];
+    
+    $datas = [
+		'title' => 'This is for chat',
+		'body' => 'body is description',
+		'groupId' => 'chat_group',
+        'status' => 'done',
+        // 'icon' => 'https://www.linkwork.in/assets/images/title.png',
+        'groupKey' => 'channel2.groupId',
+        'android_channel_id' => 'Chats',
+        'link' => 'https://beta.linkwork.in/admin/Chat/630490ab4ca9cec8122d62eb59627e95',
+        'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
+    ];
+    
+    
+    $payload = [
+	'to' 	            => 'cNSE5lVpQCerqOTmPvzPu_:APA91bFzDOaQx6znwv_53Y6EArPx0ailohoHOhgZ7crwDKQNtzD_ty_U_yixJmxlPVoxF4Hn7JHAMbnmYph1Vv8ko8oLcpkM_y422KUpgZqMqfs62_zj-jYOFBER0yzklNXjk6nhIUDp',
+	'notification'		=> $msg,
+	'data'              => $datas,
+	'priority'          => 'high'
+    ];
+
+	//Different payload
+
+	{ "notification" : {
+     "body" : "Body of Your Notification",
+     "title": "Title of Your Notification",
+     "android_channel_id": "your_channel_id"
+ },
+ "data" : {
+     "body" : "Body of Your Notification in Data",
+     "title": "Title of Your Notification in Title",
+     "click_action": "FLUTTER_NOTIFICATION_CLICK",
+ }
+}

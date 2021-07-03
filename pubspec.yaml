@@ -38,11 +38,19 @@ dependencies:
   flutter_local_notifications: ^5.0.0+4
   flutter_webview_plugin: ^0.4.0
   webview_flutter: ^2.0.8
+  animations: ^2.0.0
+  flutter_staggered_animations: ^1.0.0
+  animated_text_kit: ^4.1.1
+  flutter_downloader: ^1.6.1
+  flutter_launcher_icons: ^0.7.3
+  path_provider: ^2.0.2
+  url_launcher: ^6.0.6
+  permission_handler: ^8.1.0
   
 
-  # flutter_icon:
-  # image_path: "assets/icons.jpg"  
-  # android: true
+flutter_icons:
+  image_path_android: "assets/icons.png"
+  android: true
   
   
 
@@ -69,6 +77,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/no-internet.png
+    - assets/icons.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

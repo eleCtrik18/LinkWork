@@ -204,7 +204,7 @@ class _HomeState extends State<Home> {
 
     http.Response response = await http.post(
         Uri.parse(
-          "https://www.linkwork.in/app_api/Signup",
+          "https://www.linkwork.in/app_api/register.php",
         ),
         body: data);
     print(response.body);

@@ -6,6 +6,7 @@ import 'package:demo_app/screens/chat_box.dart';
 import 'package:demo_app/screens/signup.dart';
 import 'package:demo_app/screens/reset_pwd.dart';
 import 'package:demo_app/screens/temp_token.dart';
+import 'package:demo_app/utility/animation.dart';
 import 'package:demo_app/utility/connectivity_provider.dart';
 import 'package:demo_app/utility/no_internet.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -163,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
 
     var response = await http.post(
         Uri.parse(
-          "https://www.linkwork.in/app_api/Login",
+          "https://www.linkwork.in/app_api/login.php",
         ),
         body: data);
     print(response.body);
@@ -263,11 +264,11 @@ class _LoginPageState extends State<LoginPage> {
                         TextStyle(color: Color(0xffa7a7a7), fontSize: 12)),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Please Enter Email';
+                    return 'Please enter Email';
                   }
                   if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
                       .hasMatch(value)) {
-                    return 'Please Enter valid Email';
+                    return 'Please enter valid Email';
                   }
 
                   return null;
@@ -301,7 +302,7 @@ class _LoginPageState extends State<LoginPage> {
                         TextStyle(color: Color(0xFFa7a7a7), fontSize: 12)),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Please Enter required field Password';
+                    return 'Please enter Password';
                   }
 
                   return null;
@@ -340,7 +341,7 @@ class _LoginPageState extends State<LoginPage> {
                         ]),
                   ),
                   child: _isLoading
-                      ? Center(child: CircularProgressIndicator())
+                      ? Center(child: MyCustomWidget())
                       : SingleChildScrollView(
                           physics: AlwaysScrollableScrollPhysics(),
                           padding: EdgeInsets.symmetric(
@@ -463,7 +464,7 @@ class _LoginPageState extends State<LoginPage> {
                       ]),
                 ),
                 child: _isLoading
-                    ? Center(child: CircularProgressIndicator())
+                    ? Center(child: MyCustomWidget())
                     : SingleChildScrollView(
                         physics: AlwaysScrollableScrollPhysics(),
                         padding:
