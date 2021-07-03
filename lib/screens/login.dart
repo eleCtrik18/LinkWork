@@ -85,6 +85,7 @@ class _LoginPageState extends State<LoginPage> {
       signIn(emailController.text, passwordController.text);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('email', emailController.text);
+
       //showNotification();
       return;
     } else {
@@ -149,6 +150,7 @@ class _LoginPageState extends State<LoginPage> {
     prefs.setString("email", email);
 
     prefs.setString('pass', pass);
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     Map data = {
       'email': email,
@@ -165,15 +167,18 @@ class _LoginPageState extends State<LoginPage> {
         ),
         body: data);
     print(response.body);
+
     if (response.statusCode == 200 || response.statusCode == 400) {
       jsonResponse = json.decode(response.body);
 
       if (jsonResponse['status'] != 'Failed') {
         setState(() {
           _isLoading = false;
+          prefs.setString('id', jsonResponse['id']);
+          prefs.setString('enc', jsonResponse['enc']);
+          sharedPreferences.setString("id", jsonResponse['id']);
         });
-        showNotification();
-        sharedPreferences.setString("id", jsonResponse['id']);
+
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) => LandPage()),
             (Route<dynamic> route) => false);
@@ -305,32 +310,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void showNotification() {
-    flutterLocalNotificationsPlugin.show(
-        0,
-        "Welcome to Linkwork",
-        "Manage all you works without any lags",
-        NotificationDetails(
-            android: AndroidNotificationDetails(
-                channel.id, channel.name, channel.description,
-                importance: Importance.high,
-                color: Colors.blue,
-                playSound: true,
-                icon: '@mipmap/ic_launcher')));
-  }
-
-  Future onSelectNotification(String payload) async {
-    Navigator.pushReplacement(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (c, a1, a2) => Chatpage(),
-        transitionsBuilder: (c, anim, a2, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: Duration(milliseconds: 300),
       ),
     );
   }

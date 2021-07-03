@@ -1,6 +1,4 @@
-import 'dart:convert';
-
-import 'package:demo_app/screens/reset_pwd.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:demo_app/utility/connectivity_provider.dart';
 import 'package:demo_app/utility/no_internet.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -11,7 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login.dart';
-import 'package:http/http.dart' as http;
 
 class LandPage extends StatefulWidget {
   @override
@@ -21,15 +18,15 @@ class LandPage extends StatefulWidget {
 class _LandPageState extends State<LandPage> {
   late SharedPreferences sharedPreferences;
   var tokenValue = "";
+  var i;
   var e;
-  var p;
   late String url;
   @override
   void initState() {
     super.initState();
     checkLoginStatus();
     fetchcredentials();
-    Provider.of<ConnectivityProvider>(context, listen: false).startMonitoring();
+
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('A new onMessageOpenedApp event was published!');
       RemoteNotification notification = message.notification!;
@@ -55,11 +52,12 @@ class _LandPageState extends State<LandPage> {
   void fetchcredentials() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      e = pref.getString('email').toString();
-      p = pref.getString('pass').toString();
+      i = pref.getString('id').toString();
+      e = pref.getString('enc').toString();
     });
-    print("Email value : " + e);
-    print("Password Value : " + p);
+
+    print("id : " + i);
+    print("enc : " + e);
   }
 
   checkLoginStatus() async {
@@ -76,6 +74,7 @@ class _LandPageState extends State<LandPage> {
 
   @override
   Widget build(BuildContext context) {
+    print("BuildLandPage");
     return WillPopScope(
       onWillPop: onWillPop,
       child: Scaffold(
@@ -129,27 +128,37 @@ class _LandPageState extends State<LandPage> {
   }
 
   Widget pageUI() {
-    return Consumer<ConnectivityProvider>(
-        builder: (consumerContext, model, child) {
-      if (model.isOnline != null) {
-        return model.isOnline
-            ? Container(
-                padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-                height: 900,
+    return StreamBuilder(
+        stream: Connectivity().onConnectivityChanged,
+        builder:
+            (BuildContext context, AsyncSnapshot<ConnectivityResult> snapshot) {
+          if (snapshot != null &&
+              snapshot.hasData &&
+              snapshot.data != ConnectivityResult.none) {
+            Container(
+                padding: EdgeInsets.fromLTRB(0, 45, 0, 0),
+                height: MediaQuery.of(context).size.height / 0.50,
                 width: MediaQuery.of(context).size.width / 0.60,
                 child: InAppWebView(
-                    // initialUrl: "https://www.google.com.pk/",
                     initialUrl:
-                        "https://beta.linkwork.in/Authenticate?id=2&enc=ef52f0c009bdbc905292c79b3f634ebe",
-                    onWebViewCreated: (InAppWebViewController controller) {},
+                        "https://beta.linkwork.in/Authenticate?id=$i&enc=$e",
+                    onWebViewCreated: (InAppWebViewController controller) {
+                      print(
+                          "https://beta.linkwork.in/Authenticate?id=$i&enc=$e");
+                    },
                     onLoadStart:
                         (InAppWebViewController controller, String url) async {
+                      print(
+                          "on load https://beta.linkwork.in/Authenticate?id=$i&enc=$e");
                       if (url.contains("Logout")) {
                         print('Log Out Success');
                         sharedPreferences.remove("email");
+                        sharedPreferences.remove("id");
+                        sharedPreferences.remove("enc");
+
                         // ignore: deprecated_member_use
                         sharedPreferences.commit();
-                        Navigator.pushReplacement(
+                        await Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
                             pageBuilder: (c, a1, a2) => LoginPage(),
@@ -159,13 +168,43 @@ class _LandPageState extends State<LandPage> {
                           ),
                         );
                       }
-                    }))
-            : NoInternet();
-      }
-      return Container(
-          child: Center(
-        child: CircularProgressIndicator(),
-      ));
-    });
+                    }));
+          } else if (snapshot.data == ConnectivityResult.none) {
+            return NoInternet();
+          }
+          return Container(
+              padding: EdgeInsets.fromLTRB(0, 45, 0, 0),
+              height: MediaQuery.of(context).size.height / 0.50,
+              width: MediaQuery.of(context).size.width / 0.60,
+              child: InAppWebView(
+                  initialUrl:
+                      "https://beta.linkwork.in/Authenticate?id=$i&enc=$e",
+                  onWebViewCreated: (InAppWebViewController controller) {
+                    print("https://beta.linkwork.in/Authenticate?id=$i&enc=$e");
+                  },
+                  onLoadStart:
+                      (InAppWebViewController controller, String url) async {
+                    print(
+                        "on load https://beta.linkwork.in/Authenticate?id=$i&enc=$e");
+                    if (url.contains("Logout")) {
+                      print('Log Out Success');
+                      sharedPreferences.remove("email");
+                      sharedPreferences.remove("id");
+                      sharedPreferences.remove("enc");
+
+                      // ignore: deprecated_member_use
+                      sharedPreferences.commit();
+                      await Navigator.pushReplacement(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (c, a1, a2) => LoginPage(),
+                          transitionsBuilder: (c, anim, a2, child) =>
+                              FadeTransition(opacity: anim, child: child),
+                          transitionDuration: Duration(milliseconds: 300),
+                        ),
+                      );
+                    }
+                  }));
+        });
   }
 }

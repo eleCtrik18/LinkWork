@@ -36,7 +36,13 @@ dependencies:
   firebase_core: ^1.1.0
   firebase_messaging: ^9.1.3
   flutter_local_notifications: ^5.0.0+4
+  flutter_webview_plugin: ^0.4.0
+  webview_flutter: ^2.0.8
   
+
+  # flutter_icon:
+  # image_path: "assets/icons.jpg"  
+  # android: true
   
   
 
